@@ -13,10 +13,35 @@
 		5AA037AF126E7B2B009DB70F /* DeckLinkAPIDispatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5AA037AE126E7B2B009DB70F /* DeckLinkAPIDispatch.cpp */; };
 		5AA0395B126E8D42009DB70F /* GLScene.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5AA0395A126E8D42009DB70F /* GLScene.mm */; };
 		5AA03984126E91B9009DB70F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AA03983126E91B9009DB70F /* OpenGL.framework */; };
+		702D13D817BD9898007F7BCD /* Syphon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 702D13D717BD9877007F7BCD /* Syphon.framework */; };
+		702D13DA17BD98B6007F7BCD /* Syphon.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 702D13D717BD9877007F7BCD /* Syphon.framework */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		702D13D617BD9877007F7BCD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 702D13D117BD9877007F7BCD /* Syphon.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
+			remoteInfo = Syphon;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		702D13D917BD98A4007F7BCD /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				702D13DA17BD98B6007F7BCD /* Syphon.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -36,6 +61,7 @@
 		5AA03959126E8D42009DB70F /* GLScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLScene.h; sourceTree = "<group>"; };
 		5AA0395A126E8D42009DB70F /* GLScene.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GLScene.mm; sourceTree = "<group>"; };
 		5AA03983126E91B9009DB70F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		702D13D117BD9877007F7BCD /* Syphon.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Syphon.xcodeproj; path = "../Syphon-Framework/Syphon.xcodeproj"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* OpenGLOutput-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "OpenGLOutput-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* OpenGLOutput.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenGLOutput.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -45,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				702D13D817BD9898007F7BCD /* Syphon.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				5AA03984126E91B9009DB70F /* OpenGL.framework in Frameworks */,
 			);
@@ -128,11 +155,20 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				702D13D117BD9877007F7BCD /* Syphon.xcodeproj */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 				5AA03983126E91B9009DB70F /* OpenGL.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		702D13D217BD9877007F7BCD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				702D13D717BD9877007F7BCD /* Syphon.framework */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -145,6 +181,7 @@
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
+				702D13D917BD98A4007F7BCD /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -176,12 +213,28 @@
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* OpenGLOutput */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 702D13D217BD9877007F7BCD /* Products */;
+					ProjectRef = 702D13D117BD9877007F7BCD /* Syphon.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				8D1107260486CEB800E47090 /* OpenGLOutput */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		702D13D717BD9877007F7BCD /* Syphon.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Syphon.framework;
+			remoteRef = 702D13D617BD9877007F7BCD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8D1107290486CEB800E47090 /* Resources */ = {
