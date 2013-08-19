@@ -39,123 +39,110 @@ GLScene::GLScene()
 
 GLScene::~GLScene()
 {
+    [syClient stop];
 	[pMutex release];
 }
 
+void GLScene::setupSyphon()
+{
+    NSArray *available = [[SyphonServerDirectory sharedDirectory] servers];
+    id description = [available objectAtIndex:0];
+    syClient = [[SyphonClient alloc] initWithServerDescription:description options:nil newFrameHandler:nil];
+}
 void GLScene::InitScene()
 {
 	[pMutex lock];
-	
-	glShadeModel( GL_SMOOTH );                // Enable smooth shading
-    glClearColor( 0.0f, 0.0f, 0.0f, 0.5f );   // Black background
-	glClearDepth( 1.0f );                     // Depth buffer setup
-	glEnable( GL_DEPTH_TEST );                // Enable depth testing
+
+    this->setupSyphon();
 	glDepthFunc( GL_LEQUAL );                 // Type of depth test to do
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
 	[pMutex unlock];
 }
 
-void GLScene::DrawScene(GLint x, GLint y, GLsizei w, GLsizei h)
+void GLScene::DrawScene(GLint x, GLint y, GLsizei w, GLsizei h, CGLContextObj context)
 {
 	[pMutex lock];
 	
+	
+	glClearColor(1.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+    
 	// draw OpenGL scene
 	glViewport (x, y, w, h);
+    glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0.0, w, 0.0, h, -1, 1);
 	
-	glMatrixMode( GL_PROJECTION );   // Select the projection matrix
-	glLoadIdentity();                // and reset it
-	
-	// Calculate the aspect ratio of the view
-	gluPerspective( 45.0f, (GLdouble)w / (GLdouble)h, 0.1f, 100.0f );
-	glMatrixMode( GL_MODELVIEW );    // Select the modelview matrix
-	glLoadIdentity();                // and reset it
-	
-	// Clear the screen and depth buffer
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	
-	glLoadIdentity();   // Reset the current modelview matrix
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+    
+    // Syphon drawing code
+    SyphonImage *myFrame = [syClient newFrameImageForContext:context];
+    if (myFrame)
+    {
+        glEnable(GL_TEXTURE_RECTANGLE_ARB);
+		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, [myFrame textureName]);
+		// do a nearest linear interp.
+		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+        
+		glColor4f(1.0, 1.0, 1.0, 1.0);
+		
+		NSSize imageSize = [myFrame textureSize];
+		NSSize scaled;
+		float wr = imageSize.width / h;
+		float hr = imageSize.height / w;
+		float ratio;
+		ratio = (hr < wr ? wr : hr) * .65;
+		scaled = NSMakeSize((imageSize.width / ratio), (imageSize.height / ratio));
+		
+		GLfloat tex_coords[] =
+		{
+			0.0,	0.0,
+			imageSize.width,	0.0,
+			imageSize.width,	imageSize.height,
+			0.0,	imageSize.height
+		};
+		
+		
+		float halfw = scaled.width * 0.5;
+		float halfh = scaled.height * 0.5;
+		
+		GLfloat verts[] =
+		{
+			-halfw, -halfh,
+			halfw, -halfh,
+			halfw, halfh,
+			-halfw, halfh
+		};
+		
+		glTranslated(w * 0.5, h * 0.5, 0.0);
+		
+		glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+		glTexCoordPointer(2, GL_FLOAT, 0, tex_coords );
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(2, GL_FLOAT, 0, verts );
+		glDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
+		glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+		glDisableClientState(GL_VERTEX_ARRAY);
+        
+		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
-	glTranslatef( -1.5f, 0.0f, -6.0f );   // Left 1.5 units, into screen 6.0
-	// Rotate triangle on Y axis
-	glRotatef( flRtri, 0.0f, 1.0f, 0.0f );
+        [myFrame release];
+    }
+    // Restore OpenGL states
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
 	
-	glBegin( GL_TRIANGLES );              // Draw a triangle
-	glColor3f( 1.0f, 0.0f, 0.0f );        // Set color to red
-	glVertex3f(  0.0f,  1.0f, 0.0f );     // Top of front
-	glColor3f( 0.0f, 1.0f, 0.0f );        // Set color to green
-	glVertex3f( -1.0f, -1.0f, 1.0f );     // Bottom left of front
-	glColor3f( 0.0f, 0.0f, 1.0f );        // Set color to blue
-	glVertex3f(  1.0f, -1.0f, 1.0f );     // Bottom right of front
-	
-	glColor3f( 1.0f, 0.0f, 0.0f );        // Red
-	glVertex3f( 0.0f, 1.0f, 0.0f );       // Top of right side
-	glColor3f( 0.0f, 0.0f, 1.0f );        // Blue
-	glVertex3f( 1.0f, -1.0f, 1.0f );      // Left of right side
-	glColor3f( 0.0f, 1.0f, 0.0f );        // Green
-	glVertex3f( 1.0f, -1.0f, -1.0f );     // Right of right side
-	
-	glColor3f( 1.0f, 0.0f, 0.0f );        // Red
-	glVertex3f( 0.0f, 1.0f, 0.0f );       // Top of back side
-	glColor3f( 0.0f, 1.0f, 0.0f );        // Green
-	glVertex3f( 1.0f, -1.0f, -1.0f );     // Left of back side
-	glColor3f( 0.0f, 0.0f, 1.0f );        // Blue
-	glVertex3f( -1.0f, -1.0f, -1.0f );    // Right of back side
-	
-	glColor3f( 1.0f, 0.0f, 0.0f );        // Red
-	glVertex3f( 0.0f, 1.0f, 0.0f );       // Top of left side
-	glColor3f( 0.0f, 0.0f, 1.0f );        // Blue
-	glVertex3f( -1.0f, -1.0f, -1.0f );    // Left of left side
-	glColor3f( 0.0f, 1.0f, 0.0f );        // Green
-	glVertex3f( -1.0f, -1.0f, 1.0f );     // Right of left side
-	glEnd();                              // Done with triangle
-	
-	glLoadIdentity();                       // Reset current modelview matrix
-	glTranslatef( 1.5f, 0.0f, -7.0f );      // Move right and into screen
-	// Rotate quad on all axes
-	glRotatef( flRquad, 1.0f, 1.0f, 1.0f );
-	glBegin( GL_QUADS );                 // Draw quads
-	glColor3f( 0.0f, 1.0f, 0.0f );       // Green
-	glVertex3f(  1.0f,  1.0f, -1.0f );   // Top right of top side
-	glVertex3f( -1.0f,  1.0f, -1.0f );   // Top left of top side
-	glVertex3f( -1.0f,  1.0f,  1.0f );   // Bottom left of top side
-	glVertex3f(  1.0f,  1.0f,  1.0f );   // Bottom right of top side
-	
-	glColor3f( 1.0f, 0.5f, 0.0f );       // Orange
-	glVertex3f(  1.0f, -1.0f,  1.0f );   // Top right of bottom side
-	glVertex3f( -1.0f, -1.0f,  1.0f );   // Top left of bottom side
-	glVertex3f( -1.0f, -1.0f, -1.0f );   // Bottom left of bottom side
-	glVertex3f(  1.0f, -1.0f, -1.0f );   // Bottom right of bottom side
-	
-	glColor3f( 1.0f, 0.0f, 0.0f );       // Red  
-	glVertex3f(  1.0f,  1.0f,  1.0f );   // Top right of front side
-	glVertex3f( -1.0f,  1.0f,  1.0f );   // Top left of front side
-	glVertex3f( -1.0f, -1.0f,  1.0f );   // Bottom left of front side
-	glVertex3f(  1.0f, -1.0f,  1.0f );   // Bottom right of front side
-	
-	glColor3f( 1.0f, 1.0f, 0.0f );       // Yellow
-	glVertex3f(  1.0f, -1.0f, -1.0f );   // Bottom left of back side
-	glVertex3f( -1.0f, -1.0f, -1.0f );   // Bottom right of back side
-	glVertex3f( -1.0f,  1.0f, -1.0f );   // Top right of back side
-	glVertex3f(  1.0f,  1.0f, -1.0f );   // Top left of back side
-	
-	glColor3f( 0.0f, 0.0f, 1.0f );       // Blue
-	glVertex3f( -1.0f,  1.0f,  1.0f );   // Top right of left side
-	glVertex3f( -1.0f,  1.0f, -1.0f );   // Top left of left side
-	glVertex3f( -1.0f, -1.0f, -1.0f );   // Bottom left of left side
-	glVertex3f( -1.0f, -1.0f,  1.0f );   // Bottom right of left side
-	
-	glColor3f( 1.0f, 0.0f, 1.0f );       // Violet 
-	glVertex3f(  1.0f,  1.0f, -1.0f );   // Top right of right side
-	glVertex3f(  1.0f,  1.0f,  1.0f );   // Top left of right side
-	glVertex3f(  1.0f, -1.0f,  1.0f );   // Bottom left of right side
-	glVertex3f(  1.0f, -1.0f, -1.0f );   // Bottom right of right side
-	glEnd();                             // Quads are complete
-	
-	glFinish();
-	
-	flRtri += 0.8f;     // Increase the rotation variable for the triangle
-	flRquad -= 0.60f;   // Decrease the rotation variable for the quad	
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
 
 	[pMutex unlock];
 }

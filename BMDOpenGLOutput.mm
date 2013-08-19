@@ -270,7 +270,7 @@ void BMDOpenGLOutput::RenderToDevice()
 	old_contextObj = CGLGetCurrentContext();
     CGLSetCurrentContext (contextObj);
 
-	pGLScene->DrawScene(0, 0, uiFrameWidth, uiFrameHeight);
+	pGLScene->DrawScene(0, 0, uiFrameWidth, uiFrameHeight, contextObj);
 
 	glReadPixels(0, 0, uiFrameWidth, uiFrameHeight, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pFrame);
 

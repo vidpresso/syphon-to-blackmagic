@@ -36,6 +36,7 @@
 #include <Foundation/NSLock.h>
 #include <OpenGL/OpenGL.h>
 #include <OpenGL/glu.h>
+#include <Syphon/Syphon.h>
 
 class GLScene
 {
@@ -46,11 +47,14 @@ private:
 	
 public:
 
+    SyphonClient *syClient;
 	GLScene();
 	~GLScene();
 	
+    void setupSyphon();
 	void InitScene();
 	void DrawScene(GLint x, GLint y, GLsizei width, GLsizei height);
+	void DrawScene(GLint x, GLint y, GLsizei width, GLsizei height, CGLContextObj context);
 };
 
 #endif	// __GLScene_h__
