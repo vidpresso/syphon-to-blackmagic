@@ -53,7 +53,6 @@ public:
 	
     void setupSyphon();
 	void InitScene();
-	void DrawScene(GLint x, GLint y, GLsizei width, GLsizei height);
 	void DrawScene(GLint x, GLint y, GLsizei width, GLsizei height, CGLContextObj context);
 };
 
